@@ -521,6 +521,7 @@ asset_manager::asset_manager(std::chrono::seconds t) : timeout(t), lazy_loading(
 
             for (auto v : font_removes) {
                 fonts.erase(v);
+                audios_removed.insert({v->path, v->id});
                 v.reset();
             }
 
@@ -531,6 +532,7 @@ asset_manager::asset_manager(std::chrono::seconds t) : timeout(t), lazy_loading(
 
             for (auto v : audio_removes) {
                 audios.erase(v);
+                audios_removed.insert({v->path, v->id});
                 v.reset();
             }
         }
@@ -547,7 +549,28 @@ std::shared_ptr<audio> asset_manager::get_audio(int id) {
             return k;
         }
     }
-    return nullptr;
+    std::string path;
+    int removed_id;
+    bool found = false;
+    for (auto &[k, v] : audios_removed) {
+        if (v == id) {
+            path = k;
+            removed_id = v;
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        return nullptr;
+    }
+    int prev_audio_id = audio_id;
+    audio_id = removed_id;
+
+    std::shared_ptr<audio> a = std::make_shared<audio>(path);
+    add_audio(a);
+    audio_id = prev_audio_id;
+    asset_mutex.unlock();
+    return a;
 }
 
 int asset_manager::add_audio(std::shared_ptr<audio> audio) {
@@ -588,7 +611,30 @@ std::shared_ptr<font> asset_manager::get_font(int id) {
             return k;
         }
     }
-    return nullptr;
+    std::string path;
+    int removed_id;
+    int font_size;
+    bool found = false;
+    for (auto &[k, v] : fonts_removed) {
+        if (std::get<0>(v) == id) {
+            path = k;
+            removed_id = std::get<0>(v);
+            font_size = std::get<1>(v);
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
+        return nullptr;
+    }
+    int prev_font_id = font_id;
+    font_id = removed_id;
+
+    std::shared_ptr<font> f = std::make_shared<font>(path, font_size);
+    add_font(f);
+    font_id = prev_font_id;
+    asset_mutex.unlock();
+    return f;
 }
 
 int asset_manager::add_font(std::shared_ptr<font> font) {
@@ -792,6 +838,12 @@ void add_listener(mouse_listener_t listener) {
 
 void add_listener(mouse_move_listener_t listener) {
     mouse_move_listeners.push_back(listener);
+}
+
+bool is_down(keyboard_key key) {
+    return ((glfwGetKey(glfwGetCurrentContext(), static_cast<int>(key)) == GLFW_PRESS
+    || glfwGetKey(glfwGetCurrentContext(), static_cast<int>(key)) == GLFW_REPEAT)
+    || glfwGetKey(glfwGetCurrentContext(), static_cast<int>(key)) != GLFW_RELEASE);
 }
 
 }

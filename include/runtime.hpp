@@ -261,6 +261,7 @@ public:
 /// @brief a custom font
 class font {
 private:
+    std::string path;
     int id;
     friend class asset_manager;
 private:
@@ -306,6 +307,7 @@ public:
 /// @brief a custom audio
 class audio {
 private:
+    std::string path;
     int id;
     std::shared_ptr<audio_context> context;
     ALuint *buffer;
@@ -334,6 +336,11 @@ private:
     std::unordered_map<std::shared_ptr<font>,    std::chrono::time_point<std::chrono::high_resolution_clock>> fonts;
     std::unordered_map<std::shared_ptr<texture>, std::chrono::time_point<std::chrono::high_resolution_clock>> textures;
     std::unordered_map<std::shared_ptr<audio>,   std::chrono::time_point<std::chrono::high_resolution_clock>> audios;
+
+    //                    path      id
+    std::unordered_map<std::string, int> audios_removed;
+    //                    path                id & fsize
+    std::unordered_map<std::string, std::tuple<int, int>> fonts_removed;
 
     int shader_id = 0;
 
@@ -507,6 +514,9 @@ void add_listener(mouse_listener_t);
 /// @brief add a mouse move listener
 /// @note the listener will be called on every mouse move event
 void add_listener(mouse_move_listener_t);
+
+/// @brief no-listener bool for getting if a key is down or not
+bool is_down(keyboard_key key);
 
 }
 }
