@@ -1,0 +1,2 @@
+/usr/bin/llvm-ar qc bin/libanvilruntime.a CMakeFiles/anvilruntime.dir/src/anvilruntime.cpp.o
+/usr/bin/llvm-ranlib bin/libanvilruntime.a
