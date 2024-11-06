@@ -7,6 +7,7 @@
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <cstdlib>
+#include <functional>
 #include <iostream>
 #include <iterator>
 #include <memory>
@@ -41,6 +42,8 @@ std::string format_error(std::string error, int error_id, std::string error_sour
     return sstream.str();
 }
 
+std::vector<std::function<void()>> on_close_listeners;
+
 void gl_setup_ortho(anvil::vec2i_t size) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -49,6 +52,12 @@ void gl_setup_ortho(anvil::vec2i_t size) {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+}
+
+void close_callback(GLFWwindow *) {
+    for (auto l : on_close_listeners) {
+        l();
+    }
 }
 
 }
@@ -76,7 +85,7 @@ game::game(std::string title, anvil::vec2i_t size) : title(title), window_size(s
 
 bool game::is_running() { return !glfwWindowShouldClose(this->glfw_window); }
 
-void game::create(bool fs) {
+void game::create(bool fs, bool rz, int sp) {
     if (fs) {
         GLFWmonitor *monitor = glfwGetPrimaryMonitor();
         if (monitor == NULL) {
@@ -97,8 +106,12 @@ void game::create(bool fs) {
 #endif
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_COMPAT_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    if (rz) {
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    } else {
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    }
+    glfwWindowHint(GLFW_SAMPLES, sp);
 
     this->glfw_window = glfwCreateWindow(window_size.x, window_size.y, title.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(this->glfw_window);
@@ -171,6 +184,22 @@ void game::create(bool fs) {
             listener(event);
         }
     });
+
+    glfwSetWindowCloseCallback(this->glfw_window, util::close_callback);
+}
+
+anvil::vec2i_t game::get_window_size() {
+    if (window_size.x == 0 || window_size.y == 0) {
+        int *x = new int;
+        int *y = new int;
+        glfwGetWindowSize(this->glfw_window, x, y);
+        window_size = { *x, *y };
+    }
+    return window_size;
+}
+
+std::string game::get_window_title() {
+    return title;
 }
 
 void game::poll_events() {
@@ -179,6 +208,12 @@ void game::poll_events() {
     int *y = new int;
     glfwGetWindowSize(this->glfw_window, x, y);
     window_size = { *x, *y };
+
+    title = glfwGetWindowTitle(this->glfw_window);
+}
+
+void game::register_on_close(std::function<void()> func) {
+    util::on_close_listeners.push_back(func);
 }
 
 void game::close() {
@@ -192,6 +227,22 @@ struct __compiledshaderobj {
     GLuint id;
     GLuint program;
 };
+
+void renderer_2d::draw_texture(anvil::texture texture, anvil::vec2f_t pos, anvil::vec2i_t size) {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture.tid);
+    glColor4f(1, 1, 1, 1);
+    glBegin(GL_QUADS);
+    {
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(pos.x, pos.y);
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(pos.x + size.x, pos.y);
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(pos.x + size.x, pos.y + size.y);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(pos.x, pos.y + size.y);
+    }
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+}
 
 void renderer_2d::run_shader(anvil::shader shader) {
     for (auto &os : compiled_shaders) {

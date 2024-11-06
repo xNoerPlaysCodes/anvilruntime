@@ -52,7 +52,7 @@ struct vec4 {
     T a;
 };
 
-// Types
+// Types Definitions
 
 
 using rgba_color    =       vec4<uint8_t>;
@@ -81,15 +81,28 @@ private:
 
     friend class renderer_2d;
 public:
-    /// @brief poll events
+    /// @brief poll event
+    /// @note call this function even if you don't want to check for events otherwise the window WILL freeze and not be able to be closed
     void poll_events();
 
     /// @brief actually creates the window and makes it show on screen
     /// @note fullscreen is overriding
-    void create(bool fullscreen);
+    /// @note resizable is overriding
+    /// @note samples is overriding
+    /// @param samples amount of samples for MSAA
+    void create(bool fullscreen, bool resizable, int samples);
 
     /// @brief returns if the current window is running
     bool is_running();
+
+    /// @brief returns window title
+    std::string get_window_title();
+
+    /// @brief returns window size
+    anvil::vec2i_t get_window_size();
+
+    /// @brief register a function to be called on window close
+    void register_on_close(std::function<void()>);
 public: 
     /// @brief default constructor for game (does not create the window)
     game();
@@ -106,6 +119,7 @@ public:
 
 class shader;
 class font;
+class texture;
 
 // for renderer_2d
 struct __compiledshaderobj;
@@ -170,6 +184,9 @@ public:
 
     /// @brief draws a pixel with specified color and position
     void draw_pixel(anvil::vec2f_t position, anvil::rgba_color);
+
+    /// @brief draws a texture
+    void draw_texture(anvil::texture texture, anvil::vec2f_t pos, anvil::vec2i_t size);
 public:
     /// @brief construct a 2d renderer with a set target fps
     renderer_2d(anvil::game*, int fps);
