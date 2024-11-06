@@ -88,6 +88,12 @@ using bounding_box  =       float_bounding_box;
 
 namespace anvil {
 
+void add_segfault_signal_handler();
+
+}
+
+namespace anvil {
+
 class game {
 private:
     GLFWwindow *glfw_window;

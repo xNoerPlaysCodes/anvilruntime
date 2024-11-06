@@ -6,6 +6,7 @@
 #include <GL/glu.h>
 #include <GLFW/glfw3.h>
 #include <chrono>
+#include <csignal>
 #include <cstdlib>
 #include <functional>
 #include <iostream>
@@ -42,6 +43,11 @@ std::string format_error(std::string error, int error_id, std::string error_sour
     return sstream.str();
 }
 
+void signal_handler(int sig) {
+    std::cout << util::format_error("segfault (core dumped)", sig, "cppruntime", "fatal");
+    exit(sig);
+}
+
 std::vector<std::function<void()>> on_close_listeners;
 
 void gl_setup_ortho(anvil::vec2i_t size) {
@@ -67,6 +73,10 @@ std::vector<anvil::io::mouse_listener_t> mouse_listeners;
 std::vector<anvil::io::mouse_move_listener_t> mouse_move_listeners;
 
 namespace anvil {
+
+void add_segfault_signal_handler() {
+    signal(SIGSEGV, util::signal_handler);
+}
 
 game::game() : title("game window"), window_size({ 800, 600 }) {
     int ret = glfwInit();
