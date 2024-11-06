@@ -1,0 +1,11 @@
+# --- .gitignore ---
+
+# ignore binary dirs
+/bin/
+/CMakeFiles/
+
+# ignore build files
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
