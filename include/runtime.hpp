@@ -57,12 +57,16 @@ struct vec4 {
 struct int_bounding_box {
     vec2<int> position;
     vec2<int> size;
+
+    bool intersects(int_bounding_box &other);
 };
 
 /// @brief a 2D bounding box
 struct float_bounding_box {
     vec2<float> position;
     vec2<float> size;
+
+    bool intersects(float_bounding_box &other);
 };
 
 // Types Definitions

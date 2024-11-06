@@ -78,6 +78,24 @@ void add_segfault_signal_handler() {
     signal(SIGSEGV, util::signal_handler);
 }
 
+bool float_bounding_box::intersects(float_bounding_box &other) {
+    return this->position.x < other.position.x + other.size.x
+            && this->position.x + this->size.x > other.position.x
+            && this->position.y < other.position.y + other.size.y
+            && this->position.y + this->size.y > other.position.y;
+}
+
+bool int_bounding_box::intersects(int_bounding_box &other) {
+    return this->position.x < other.position.x + other.size.x
+            && this->position.x + this->size.x > other.position.x
+            && this->position.y < other.position.y + other.size.y
+            && this->position.y + this->size.y > other.position.y;
+}
+
+}
+
+namespace anvil {
+
 game::game() : title("game window"), window_size({ 800, 600 }) {
     int ret = glfwInit();
     if (!ret) {
