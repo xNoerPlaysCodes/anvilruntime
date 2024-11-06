@@ -1,4 +1,5 @@
 # AnvilRuntime
+<center><img src="https://raw.githubusercontent.com/xNoerPlaysCodes/anvilruntime/refs/heads/master/anvilge.nobg.png"></img></center>
 <center>Library for Making Games in C++ <b>Easy Fast & Free</b></center>
 
 ## Examples
@@ -9,9 +10,9 @@
 int main() {
     anvil::game game;
     game.create(false, false, 4);
-    
-    anvil::renderer_2d(&game);
-    
+
+    anvil::renderer_2d renderer(&game, 60);
+
     while (game.is_running()) {
         renderer.begin_frame();
         renderer.clear({ 0, 0, 0, 255 });
@@ -23,7 +24,7 @@ int main() {
     }
 }
 ```
-
+<img src="https://raw.githubusercontent.com/xNoerPlaysCodes/anvilruntime/refs/heads/master/image.png"></img>
 <i>Create a basic window with a renderer and draw a rectangle.</i>
 
 ## Features
@@ -40,4 +41,10 @@ If you'd like to create a binding, put your github link here and submit a pull r
 
 ## Technical Info
 Distributed as a `static library`, written in `C++17`<br>
-Compiled with `clang++`
+Compiled with `clang++`<br>
+Libraries used:
+- `OpenGL   - Graphics`
+- `GLFW     - Windowing`
+- `GLU      - Orthographic and Perspective Projection`
+- `GLEW     - Loading OpenGL Functions`
+- `OpenAL   - Audio`
