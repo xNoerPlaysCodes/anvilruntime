@@ -474,7 +474,8 @@ audio::audio(std::string path) {
     // Decode the Vorbis file
     stb_vorbis* vorbis = stb_vorbis_open_filename(path.c_str(), nullptr, nullptr);
     if (!vorbis) {
-        throw std::runtime_error("Failed to open vorbis file");
+        std::cout << util::format_error("failed to load vorbis file", -1, "stb_vorbis.h - stb_vorbis_open_filename(...)", "fatal");
+        std::exit(1);
     }
 
     // Get the format info
@@ -502,6 +503,8 @@ audio::audio(std::string path) {
         std::cout << util::format_error(alGetString(error), error, "openal", "fatal");
         std::exit(1);
     }
+
+    this->path = path;
 }
 
 void audio::set_audio_context(std::shared_ptr<audio_context> ac) {
