@@ -30,6 +30,10 @@ int main() {
 - Well Documented
 - Simple API
 
+## Bindings
+Currently there are only bindings for `C++`<br>
+If you'd like to create a binding, put your github link here and submit a pull request!
+
 ## Documentation
 - All functions, classes, structs etc.. are documented in the include header
 - Additional documentation can be reached in the Github "Wiki" page
