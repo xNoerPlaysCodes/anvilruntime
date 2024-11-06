@@ -372,6 +372,9 @@ public:
     /// @param path the path to the .ogg file
     /// @note only takes in .ogg files
     audio(std::string path);
+public:
+    void cleanup();
+    ~audio();
 };
 
 /// @brief a lazy-loading asset manager

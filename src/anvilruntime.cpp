@@ -190,10 +190,10 @@ void game::create(bool fs, bool rz, int sp) {
 
 anvil::vec2i_t game::get_window_size() {
     if (window_size.x == 0 || window_size.y == 0) {
-        int *x = new int;
-        int *y = new int;
-        glfwGetWindowSize(this->glfw_window, x, y);
-        window_size = { *x, *y };
+        int x;
+        int y;
+        glfwGetWindowSize(this->glfw_window, &x, &y);
+        window_size = { x, y };
     }
     return window_size;
 }
@@ -204,10 +204,10 @@ std::string game::get_window_title() {
 
 void game::poll_events() {
     glfwPollEvents();
-    int *x = new int;
-    int *y = new int;
-    glfwGetWindowSize(this->glfw_window, x, y);
-    window_size = { *x, *y };
+    int x;
+    int y;
+    glfwGetWindowSize(this->glfw_window, &x, &y);
+    window_size = { x, y };
 
     title = glfwGetWindowTitle(this->glfw_window);
 }
@@ -368,7 +368,7 @@ void renderer_2d::glinit() {
     GLenum err = glewInit();
     if (err != GLEW_OK) {
         const GLubyte *err_str = glewGetErrorString(err);
-        const char* errstr = (char*)err_str;
+        const char* errstr = (char*) (err_str); // We have to do C-style string casting :(
         std::cout << util::format_error(errstr, err, "glew", "fatal");
         std::exit(1);
     }
@@ -546,6 +546,18 @@ void audio::play() {
     alGenSources(1, &source);
     alSourcei(source, AL_BUFFER, *buffer);
     alSourcePlay(source);
+}
+
+void audio::cleanup() {
+    if (buffer) {
+        alDeleteBuffers(1, buffer);
+        delete buffer;
+        buffer = nullptr;
+    }
+}
+
+audio::~audio() {
+    cleanup();
 }
 
 audio_context::audio_context() {
