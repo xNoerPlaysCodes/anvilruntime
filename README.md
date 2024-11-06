@@ -10,9 +10,9 @@
 int main() {
     anvil::game game;
     game.create(false, false, 4);
-
+    
     anvil::renderer_2d renderer(&game, 60);
-
+    
     while (game.is_running()) {
         renderer.begin_frame();
         renderer.clear({ 0, 0, 0, 255 });
