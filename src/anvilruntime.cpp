@@ -241,6 +241,8 @@ void renderer_2d::draw_texture(anvil::texture texture, anvil::vec2f_t pos, anvil
     }
     glEnd();
 
+    triangle_count += 2;
+
     glDisable(GL_TEXTURE_2D);
 }
 
@@ -342,6 +344,26 @@ renderer_2d::renderer_2d(anvil::game *g, int fps_) {
     glinit();
 }
 
+int renderer_2d::fps() {
+    return target_fps;
+}
+
+uint64_t renderer_2d::get_frame_counter() {
+    return frame_counter;
+}
+
+bool renderer_2d::vsync() {
+    return is_vsync;
+}
+
+double renderer_2d::deltatime() {
+    return delta_time;
+}
+
+int renderer_2d::tri_count() {
+    return triangle_count;
+}
+
 void renderer_2d::glinit() {
     GLenum err = glewInit();
     if (err != GLEW_OK) {
@@ -389,6 +411,7 @@ void renderer_2d::draw_rect(anvil::vec2f_t pos, anvil::vec2f_t size, anvil::rgba
     glEnd();
 
     util::gl_setup_ortho(game->window_size);
+    triangle_count += 2;
 }
 
 void renderer_2d::draw_circle(anvil::vec2f_t pos, float radius, anvil::rgba_color color, int segments) {
@@ -398,6 +421,7 @@ void renderer_2d::draw_circle(anvil::vec2f_t pos, float radius, anvil::rgba_colo
         for (int i = 0; i <= segments; i++) {
             float angle = 2 * M_PI * i / segments;
             glVertex2f(pos.x + radius * cos(angle), pos.y + radius * sin(angle));
+            triangle_count++;
         }
     }
     glEnd();

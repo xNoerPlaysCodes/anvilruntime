@@ -52,6 +52,19 @@ struct vec4 {
     T a;
 };
 
+/// @brief a 2D bounding box
+/// @note use ONLY and ONLY for draw-time casting or your precision will be absolute garbage
+struct int_bounding_box {
+    vec2<int> position;
+    vec2<int> size;
+};
+
+/// @brief a 2D bounding box
+struct float_bounding_box {
+    vec2<float> position;
+    vec2<float> size;
+};
+
 // Types Definitions
 
 
@@ -67,6 +80,9 @@ using vec3f_t       =       vec3<float>;
 using vec3d_t       =       vec3<double>;
 
 using ldouble_t     =       long double;
+
+using ibounding_box =       int_bounding_box;
+using bounding_box  =       float_bounding_box;
 
 }
 
@@ -138,6 +154,8 @@ private:
 
     uint64_t frame_counter;
 
+    int triangle_count;
+
     std::vector<__compiledshaderobj> compiled_shaders;
 private:
     void glinit();
@@ -187,6 +205,21 @@ public:
 
     /// @brief draws a texture
     void draw_texture(anvil::texture texture, anvil::vec2f_t pos, anvil::vec2i_t size);
+
+    /// @brief get amount of frames that has passed
+    uint64_t get_frame_counter();
+
+    /// @brief get vsync on or off
+    bool vsync();
+
+    /// @brief get fps
+    int fps();
+
+    /// @brief get delta time
+    double deltatime();
+
+    /// @brief get amount of triangles drawn
+    int tri_count();
 public:
     /// @brief construct a 2d renderer with a set target fps
     renderer_2d(anvil::game*, int fps);
