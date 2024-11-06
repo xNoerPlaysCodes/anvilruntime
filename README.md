@@ -8,7 +8,7 @@
 
 int main() {
     anvil::game game;
-    game.create(false);
+    game.create(false, false, 4);
     
     anvil::renderer_2d(&game);
     
